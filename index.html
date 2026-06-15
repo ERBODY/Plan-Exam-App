@@ -4404,6 +4404,57 @@
         }
 
         init();
-    </script>
+    <script>
+(function(){
+  const sidebar = document.getElementById('sidebar');
+  const overlay = document.querySelector('.overlay');
+
+  function openSidebar(){
+    sidebar.classList.add('open');
+    overlay.classList.add('show');
+    document.body.style.overflow = 'hidden'; // يمنع التمرير عند فتح الشريط على الموبايل
+    sidebar.setAttribute('aria-hidden', 'false');
+  }
+
+  function closeSidebar(){
+    sidebar.classList.remove('open');
+    overlay.classList.remove('show');
+    document.body.style.overflow = '';
+    sidebar.setAttribute('aria-hidden', 'true');
+  }
+
+  // هذه الدالة تُستخدم من onclick الموجود بالفعل: onclick="toggleSidebar()"
+  window.toggleSidebar = function(){
+    if (sidebar.classList.contains('open')) closeSidebar();
+    else openSidebar();
+  };
+
+  // أغلق لما تضغط على الـ overlay (خلفية)
+  overlay.addEventListener('click', closeSidebar);
+
+  // أغلق عند النقر على أي عنصر ناڤيجايشن (مفيد على الموبايل)
+  document.querySelectorAll('.nav-item').forEach(item => {
+    item.addEventListener('click', () => {
+      if (window.innerWidth <= 768) closeSidebar();
+    });
+  });
+
+  // أغلق عند الضغط على Escape
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') closeSidebar();
+  });
+
+  // تزامن الحالة عند تغيير حجم النافذة: لو الشاشة كبيرة نتأكد الشريط مظبوط
+  window.addEventListener('resize', () => {
+    if (window.innerWidth > 768) {
+      // على الشاشات الكبيرة الشريط عادة ثابت، فنتأكد إن overlay مخفي وأي حالة "open" تُزال
+      overlay.classList.remove('show');
+      document.body.style.overflow = '';
+      // لا نزيل sidebar بالكامل لأن على الديسكتوب يجب أن يبقى ظاهراً،
+      // لكن لو عندك حالة ترغب فيها بإخفائه على الديسكتوب، أخبرني لأعطيك تعديل CSS بسيط.
+    }
+  });
+})();
+</script>
 </body>
 </html>
